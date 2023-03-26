@@ -4,21 +4,21 @@
 ### Do not forget to adjust the following variables to your own plugin.
 
 # The plugin's identifier, has to be unique
-plugin_identifier = "webrtc_camerastreamer"
+plugin_identifier = "camerastreamer_control"
 
 # The plugin's python package, should be "octoprint_<plugin identifier>", has to be unique
-plugin_package = "octoprint_webrtc_camerastreamer"
+plugin_package = "octoprint_camerastreamer_control"
 
 # The plugin's human readable name. Can be overwritten within OctoPrint's internal data via __plugin_name__ in the
 # plugin module
-plugin_name = "OctoPrint-WebRTC-CameraStreamer"
+plugin_name = "OctoPrint-CameraStreamer-Control"
 
 # The plugin's version. Can be overwritten within OctoPrint's internal data via __plugin_version__ in the plugin module
 plugin_version = "1.0.0"
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module
-plugin_description = """Adds support for viewing OctoPi's camera-streamer WebRTC implementation"""
+plugin_description = """Adds support for viewing OctoPi's camera-streamer WebRTC implementation & other camera controls"""
 
 # The plugin's author. Can be overwritten within OctoPrint's internal data via __plugin_author__ in the plugin module
 plugin_author = "Charlie Powell"
@@ -27,7 +27,7 @@ plugin_author = "Charlie Powell"
 plugin_author_email = "cp2004.github@gmail.com"
 
 # The plugin's homepage URL. Can be overwritten within OctoPrint's internal data via __plugin_url__ in the plugin module
-plugin_url = "https://github.com/cp2004/OctoPrint-WebRTC-CameraStreamer"
+plugin_url = "https://github.com/cp2004/OctoPrint-CameraStreamer-Control"
 
 # The plugin's license. Can be overwritten within OctoPrint's internal data via __plugin_license__ in the plugin module
 plugin_license = "AGPLv3"
@@ -61,7 +61,7 @@ plugin_ignored_packages = []
 #     additional_setup_parameters = {"dependency_links": ["https://github.com/someUser/someRepo/archive/master.zip#egg=someDependency-dev"]}
 # "python_requires": ">=3,<4" blocks installation on Python 2 systems, to prevent confused users and provide a helpful error.
 # Remove it if you would like to support Python 2 as well as 3 (not recommended).
-additional_setup_parameters = {"python_requires": ">=3.7,<4"}
+additional_setup_parameters = {"python_requires": ">=3.9,<4"}
 
 ########################################################################################################################
 

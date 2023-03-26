@@ -1,0 +1,8 @@
+<div id="camerastreamer_control_container">
+    <!-- ko if: currentMode() == 'mjpg' -->
+    {% include "modes/mjpg.jinja2" %}
+    <!-- /ko -->
+    <!-- ko if: currentMode() == 'webrtc' -->
+    {% include "modes/webrtc.jinja2" %}
+    <!-- /ko -->
+</div>

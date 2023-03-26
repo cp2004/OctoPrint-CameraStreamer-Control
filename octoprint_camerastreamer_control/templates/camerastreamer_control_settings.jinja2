@@ -1,0 +1,51 @@
+{% import "macros.jinja2" as macros %}
+
+<h5>Camera Streamer Control</h5>
+
+<p>
+    This plugin enables some configuration of the extra features that come with OctoPi's
+    <a href="https://github.com/ayufan/camera-streamer" target="_blank" rel="noreferrer">camera-streamer</a>
+    implementation.
+</p>
+
+
+
+{# Check for OctoPi installation of camera-streamer #}
+{% if not "plugin_camerastreamer_control_installed" %}
+<div class="alert-block alert-warning">
+    <p>
+        <strong>It looks like camera-streamer is not installed</strong>
+        <br/>
+        This plugin will likely not work on your install.
+    </p>
+</div>
+{% endif %}
+
+<h5>Stream Options</h5>
+
+<div class="form-horizontal" onsubmit="return false">
+    <div class="control-group">
+        <label class="control-label" for="{{ macros.id("mode") }}">Preferred Video Mode</label>
+        <div class="controls">
+            <select id="{{ macros.id("mode") }}" data-bind="value: {{ macros.settings_binding("mode") }}">
+                <option value="mjpg">Mjpg</option>
+                <option value="webrtc">WebRTC (experimental)</option>
+                <option value="mp4">MP4</option>
+                <option value="mkv">MKV</option>
+                <option value="hls">HLS</option>
+            </select>
+        </div>
+        <em class="help-inline" data-bind="visible: {{ macros.settings_binding("mode") }}() !== 'mjpg'">
+            If the preferred video mode fails to connect, it will fall back to Mjpg mode.
+        </em>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="{{ macros.id("url") }}">Stream URL</label>
+        <div class="controls">
+            <input type="text" id="{{ macros.id("url") }}" data-bind="value: {{ macros.settings_binding("url") }}" />
+        </div>
+        <em class="help-block">You should not normally have to change this</em>
+    </div>
+</div>
+
+{# TODO extra messages about mp4/mkv/hls not working in all browsers #}

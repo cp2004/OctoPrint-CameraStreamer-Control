@@ -1,0 +1,5 @@
+{% import "macros.jinja2" as macros %}
+
+<div id="{{ macros.id("webrtc_container") }}">
+    <video id="{{ macros.id("webrtc_video") }}" muted autoplay playsinline controls {# TODO controls? doesn't work with rotation iirc #} style="width: 100%"></video>
+</div>
