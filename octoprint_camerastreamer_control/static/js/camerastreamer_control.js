@@ -12,9 +12,10 @@ $(function() {
     function CameraStreamerControlViewModel(parameters) {
         /* TODO list
          *  Bugs:
-         *  * Intersection observer doesn't seem to like me scrolling on the page, sends signal to unload the stream
+         *  * Intersection observer doesn't seem to like me scrolling on the page, sends signal to unload the stream. why? doesn't seem to do it with classicam
          *  Goal 1: Support Mjpg & WebRTC streams smoothly for one camera
          *  * timeout if webrtc doesn't load
+         *  * Show warning if fallen back to mjpg
          *  * Error message if mjpg doesn't load
          *  * Smooth settings configuration
          *  Goal 2: Support snapshots for one camera (can then disable classicwebcam)
@@ -23,6 +24,7 @@ $(function() {
         var self = this;
 
         self.settingsViewModel = parameters[0];
+        self.loginState = parameters[1];
 
         self.getSetting = function (name) {
             // TODO work with nested settings
@@ -113,7 +115,8 @@ $(function() {
             const map = {
                 'mjpg': self.stopMjpg,
                 'webrtc': self.stopWebRTC,
-                '': () => {} // no webcam is active, do nothing
+                '': () => {}, // no webcam is active, do nothing
+                'error': () => {}  // nothing to stop...
             }
 
             try {
@@ -158,7 +161,9 @@ $(function() {
         }
 
         self.onMjpgError = function () {
-
+            console.error("Mjpg stream failed to load at: " + self.getSetting("url")())
+            // Display an error message to the user
+            self.currentMode("error")
         }
 
         // webrtc mode
@@ -203,6 +208,7 @@ $(function() {
                     type: 'request',
                 }),
                 method: 'POST',
+                // todo abort fetch with AbortController
             }).then((response) => {
                 return response.json()
             }).then((answer) => {
@@ -241,9 +247,10 @@ $(function() {
             }).then((response) => {
                 return response.json()
             }).catch((error) => {
-                // TODO handle errors
-                // and fall back to mjpg
+                console.error("Error loading WebRTC Stream")
                 console.error(error)
+                console.warn("Falling back to mjpg")
+                self.startMjpg()
             })
         }
 
@@ -262,7 +269,7 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push({
         construct: CameraStreamerControlViewModel,
-        dependencies: ["settingsViewModel"],
+        dependencies: ["settingsViewModel", "loginStateViewModel"],
         elements: ["#settings_plugin_camerastreamer_control", "#webcam_plugin_camerastreamer_control"]
     });
 });

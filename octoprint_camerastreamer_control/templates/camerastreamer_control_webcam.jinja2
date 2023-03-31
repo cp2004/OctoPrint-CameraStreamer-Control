@@ -5,4 +5,7 @@
     <!-- ko if: currentMode() == 'webrtc' -->
     {% include "modes/webrtc.jinja2" %}
     <!-- /ko -->
+    <!-- ko if: currentMode() == "error" -->
+    {% include "modes/error.jinja2" %}
+    <!-- /ko -->
 </div>
