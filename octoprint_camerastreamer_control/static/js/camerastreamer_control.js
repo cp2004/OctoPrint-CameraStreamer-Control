@@ -10,6 +10,16 @@ $(function() {
     }
 
     function CameraStreamerControlViewModel(parameters) {
+        /* TODO list
+         *  Bugs:
+         *  * Intersection observer doesn't seem to like me scrolling on the page, sends signal to unload the stream
+         *  Goal 1: Support Mjpg & WebRTC streams smoothly for one camera
+         *  * timeout if webrtc doesn't load
+         *  * Error message if mjpg doesn't load
+         *  * Smooth settings configuration
+         *  Goal 2: Support snapshots for one camera (can then disable classicwebcam)
+         *  Goal 3: Support multiple camera-streamer cameras
+         */
         var self = this;
 
         self.settingsViewModel = parameters[0];
@@ -21,9 +31,9 @@ $(function() {
 
         self.webcamVisible = ko.observable(false)
         self.currentMode = ko.observable("")
+        self.streamStopTimer = null
 
-        //self.onWebcamVisibilityChange = function (visible) {  // TODO this is a typo in OctoPrint
-        self.onWebcamVisbilityChange = function (visible) {
+        self.onWebcamVisibilityChange = function (visible) {
             console.log("CSC Webcam visibility changed: " + visible)
             self.webcamVisible(visible)
             if (visible) {
@@ -33,33 +43,85 @@ $(function() {
             }
         }
 
-        // TODO update on settings change as well to collect new config
+        self.onWebcamVisbilityChange = self.onWebcamVisibilityChange  // This is a typo in OctoPrint 1.9.0rc1-3
+
+        self.onEventSettingsUpdated = function () {
+            // Reload the stream when settings are changed
+            // TODO doesn't need to happen for all settings, presumably just csc ones
+            self.stopStream(true)
+            self.startStream()
+        }
 
         self.startStream = function () {
-            // TODO timeout so we don't try and start too fast
+            if (self.streamStopTimer !== null) {
+                // We were timing out to stop the stream, but we don't need to anymore.
+                // So just clear the timeout and do nothing
+                console.log("aborting timeout")
+                clearTimeout(self.streamStopTimer)
+                self.streamStopTimer = null
+                return
+            }
+
+            console.log("Starting stream")
+
             // Try starting the preferred video method
             const map = {
                 'mjpg': self.startMjpg,
                 'webrtc': self.startWebRTC
             }
 
-            const config = self.settingsViewModel.settings.plugins.camerastreamer_control.mode()
-            if (config in map) {
-                map[config]()
-            } else {
-                console.error("Unknown video mode: " + config)
-                // Fall back to mjpg as much as possible
+            const mode = self.settingsViewModel.settings.plugins.camerastreamer_control.mode()
+
+            const fallback = () => {
+                console.warn("Falling back to mjpg")
                 self.startMjpg()
+            }
+
+            try {
+                if (!(mode in map)) {
+                    console.error("Unknown video mode: " + mode)
+                    fallback()
+                }
+                map[mode]()
+            } catch (err) {
+                console.error("Error starting stream: " + mode)
+                console.error(err)
+                fallback()
             }
         }
 
-        self.stopStream = function () {
+        self.stopStream = function (force) {
+            if (!force) {
+                console.log("Stopping stream in timeout seconds")
+                // Set a timeout to stop the stream, so it doesn't stop and start too quickly
+                const timeout = self.getSetting("timeout")() * 1000
+
+                if (self.streamStopTimer !== null) {
+                    clearTimeout(self.streamStopTimer)
+                }
+
+                self.streamStopTimer = setTimeout(() => {
+                    self.streamStopTimer = null
+                    self.stopStream(true)
+                }, timeout)
+
+                return
+            }
+
+            console.log("Stopping stream")
+
             const map = {
                 'mjpg': self.stopMjpg,
                 'webrtc': self.stopWebRTC,
                 '': () => {} // no webcam is active, do nothing
             }
 
+            try {
+                map[self.currentMode()]()
+            } catch (err) {
+                console.error("Error stopping stream: " + self.currentMode())
+                console.error(err)
+            }
             map[self.currentMode()]()
         }
 
@@ -91,7 +153,8 @@ $(function() {
         }
 
         self.onMjpgLoaded = function () {
-
+            // TODO what do we need this for?
+            // maybe useful for timeouts
         }
 
         self.onMjpgError = function () {
@@ -185,6 +248,8 @@ $(function() {
         }
 
         self.stopWebRTC = function () {
+            // TODO don't stop the stream if playing in PIP mode
+
             console.log("Stopping WebRTC stream")
             self.currentMode("")
             if (self.webrtcPC === null) {

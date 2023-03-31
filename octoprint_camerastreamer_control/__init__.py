@@ -19,7 +19,7 @@ class CameraStreamerControlPlugin(
             "flipH": False,
             "flipV": False,
             "rotate90": False,
-            "timeout": 10,
+            "timeout": 5,
             "mjpg_timeout": 5,
             # TODO there's a lot more settings that should go here
         }
