@@ -1,4 +1,6 @@
 import pathlib
+import requests
+import threading
 
 import octoprint.plugin
 
@@ -11,6 +13,25 @@ class CameraStreamerControlPlugin(
     octoprint.plugin.TemplatePlugin,
     octoprint.plugin.WebcamProviderPlugin,
 ):
+    _capture_mutex = threading.Lock()
+
+    def take_webcam_snapshot(self, _):
+        snapshot_url = f"{self._settings.get(['url']).rstrip('/')}/snapshot"
+
+        if not snapshot_url.startswith("http"):
+            snapshot_url = f"http://127.0.0.1/{snapshot_url.lstrip('/')}"
+
+        with self._capture_mutex:
+            self._logger.debug(f"Capturing image from {snapshot_url}")
+            r = requests.get(
+                snapshot_url,
+                stream=True,
+                timeout=self._settings.get_int(["snapshotTimeout"]),
+                verify=self._settings.get_boolean(["snapshotSslValidationtate90"]),
+            )
+            r.raise_for_status()
+            return r.iter_content(chunk_size=1024)
+
     def get_settings_defaults(self):
         return {
             "mode": "webrtc",
@@ -20,8 +41,14 @@ class CameraStreamerControlPlugin(
             "flipV": False,
             "rotate90": False,
             "timeout": 5,
-            "mjpg_timeout": 5,
-            # TODO there's a lot more settings that should go here
+            "ratio": "16:9",
+            "webrtc": {
+                "stun": "stun:stun.l.google.com:19302",
+            },
+            "snapshot": {
+                "timeout": 5,
+                "validate_ssl": True,
+            }
         }
 
     def get_template_vars(self):
@@ -70,20 +97,42 @@ class CameraStreamerControlPlugin(
         }
 
     def get_webcam_configurations(self):
+        url = self._settings.get(["url"]).rstrip("/")
+
+        if not url.startswith("http"):
+            snapshot_url = f"http://127.0.0.1/{url.lstrip('/')}/snapshot"
+        else:
+            snapshot_url = f"{url}/snapshot"
+
         return [
             Webcam(
                 name=self._identifier,
                 displayName="Camera Streamer",
-                canSnapshot=True,  # TODO configurable?
-                snapshotDisplay="blub",  # optional
+                canSnapshot=True,
+                snapshotDisplay=snapshot_url,
                 flipH=self._settings.get_boolean(["flipH"]),
                 flipV=self._settings.get_boolean(["flipV"]),
                 rotate90=self._settings.get_boolean(["rotate90"]),
-                # compat=WebcamCompatibility()  # TODO
+                compat=WebcamCompatibility(
+                    stream=f"{url}/stream",
+                    streamTimeout=self._settings.get_int(["timeout"]),
+                    streamRatio=self._settings.get(["ratio"]),
+                    streamWebrtcIceServers=[self._settings.get(["webrtc", "stun"])],
+                    snapshot=f"{self._settings.get(['url']).rstrip()}/snapshot",
+                    snapshotTimeout=self._settings.get(["snapshot", "timeout"]),
+                    snapshotSslValidation=self._settings.get(["snapshot", "validate_ssl"])
+                )
             )
         ]
 
-    # TODO a get_template_configs to name the webcam in the control tab
+    def get_template_configs(self):
+        return [
+            {
+                "type": "webcam",
+                "template": "camerastreamer_control_webcam.jinja2",
+                "name": "Camera Streamer",
+            }
+        ]
 
 
 # TODO check styling of camera-streamer actual name

@@ -13,13 +13,15 @@ $(function() {
         /* TODO list
          *  Bugs:
          *  * Intersection observer doesn't seem to like me scrolling on the page, sends signal to unload the stream. why? doesn't seem to do it with classicam
+         *  * Doesn't always seem to load stream on first load, no webcam mode gets selected
          *  Goal 1: Support Mjpg & WebRTC streams smoothly for one camera
          *  * timeout if webrtc doesn't load
          *  * Show warning if fallen back to mjpg
-         *  * Error message if mjpg doesn't load
          *  * Smooth settings configuration
+         *  * WebRTC stun make it a comma separated list
          *  Goal 2: Support snapshots for one camera (can then disable classicwebcam)
          *  Goal 3: Support multiple camera-streamer cameras
+         *  Finally: sort out logging
          */
         var self = this;
 
@@ -185,8 +187,8 @@ $(function() {
             // https://github.com/ayufan/camera-streamer/blob/cdb62efd931b8bde5ab49d5319091714f48027b1/html/webrtc.html
             const config = {
                 sdpSemantics: 'unified-plan',
-                iceServers: [  //  TODO configurable
-                    {urls: 'stun:stun.l.google.com:19302'},
+                iceServers: [  //  TODO configurable as comma separated list
+                    {urls: self.settingsViewModel.settings.plugins.camerastreamer_control.webrtc.stun()},
                 ]
             }
 
