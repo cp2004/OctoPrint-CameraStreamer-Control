@@ -9,6 +9,16 @@ $(function() {
         return `camerastreamer_control_${name}`
     }
 
+    const log = (msg) => {
+        console.log(`CSC: ${msg}`)
+    }
+    const warn = (msg) => {
+        console.warn(`CSC: ${msg}`)
+    }
+    const error = (msg) => {
+        console.error(`CSC: ${msg}`)
+    }
+
     function CameraStreamerControlViewModel(parameters) {
         /* TODO list
          *  Bugs:
@@ -18,6 +28,7 @@ $(function() {
          *  * Show warning if fallen back to mjpg
          *  * Smooth settings configuration
          *  * WebRTC stun make it a comma separated list
+         *  * Flip & rotate
          *  Goal 3: Support multiple camera-streamer cameras
          *  Finally: sort out logging
          */
@@ -42,6 +53,7 @@ $(function() {
                 return
             }
 
+            log("Webcam visibility changed: " + visible)
             self.webcamVisible(visible)
             if (visible) {
                 self.startStream()
@@ -63,13 +75,13 @@ $(function() {
             if (self.streamStopTimer !== null) {
                 // We were timing out to stop the stream, but we don't need to anymore.
                 // So just clear the timeout and do nothing
-                console.log("aborting timeout")
+                log("Aborting timeout")
                 clearTimeout(self.streamStopTimer)
                 self.streamStopTimer = null
                 return
             }
 
-            console.log("Starting stream")
+            log("Starting stream")
 
             // Try starting the preferred video method
             const map = {
@@ -80,28 +92,30 @@ $(function() {
             const mode = self.settingsViewModel.settings.plugins.camerastreamer_control.mode()
 
             const fallback = () => {
-                console.warn("Falling back to mjpg")
+                warn("Falling back to mjpg")
                 self.startMjpg()
             }
 
             try {
                 if (!(mode in map)) {
-                    console.error("Unknown video mode: " + mode)
+                    error("Unknown video mode: " + mode)
                     fallback()
                 }
                 map[mode]()
             } catch (err) {
-                console.error("Error starting stream: " + mode)
-                console.error(err)
+                error("Error starting stream: " + mode)
+                error(err)
                 fallback()
             }
         }
 
         self.stopStream = function (force) {
             if (!force) {
-                console.log("Stopping stream in timeout seconds")
                 // Set a timeout to stop the stream, so it doesn't stop and start too quickly
                 const timeout = self.getSetting("timeout")() * 1000
+
+                log(`Stopping stream in ${timeout / 1000} seconds`)
+
 
                 if (self.streamStopTimer !== null) {
                     clearTimeout(self.streamStopTimer)
@@ -115,7 +129,7 @@ $(function() {
                 return
             }
 
-            console.log("Stopping stream")
+            log("Stopping stream")
 
             const map = {
                 'mjpg': self.stopMjpg,
@@ -127,15 +141,15 @@ $(function() {
             try {
                 map[self.currentMode()]()
             } catch (err) {
-                console.error("Error stopping stream: " + self.currentMode())
-                console.error(err)
+                error("Error stopping stream: " + self.currentMode())
+                error(err)
             }
             map[self.currentMode()]()
         }
 
         self.startMjpg = function () {
             self.currentMode("mjpg")
-            console.log("Starting MJPG stream: " + self.getSetting("url")())
+            log("Starting MJPG stream from " + self.getSetting("url")())
 
             const element = document.getElementById(id("mjpg_image"))
             const currentsrc = element.getAttribute("src")
@@ -147,7 +161,7 @@ $(function() {
 
             if (currentsrc !== newsrc) {
                 // TODO cache buster
-                console.log("Setting new MJPG stream: " + newsrc)
+                log("Setting new MJPG stream: " + newsrc)
                 element.setAttribute("src", newsrc)
             }
         }
@@ -166,7 +180,7 @@ $(function() {
         }
 
         self.onMjpgError = function () {
-            console.error("Mjpg stream failed to load at: " + self.getSetting("url")())
+            error("Mjpg stream failed to load at: " + self.getSetting("url")())
             // Display an error message to the user
             self.currentMode("error")
         }
@@ -182,7 +196,7 @@ $(function() {
             }
 
             self.currentMode("webrtc")
-            console.log("Starting WebRTC stream: " + self.getSetting("url")())
+            log("Starting WebRTC stream from " + self.getSetting("url")())
 
             const video = document.getElementById(id("webrtc_video"))
 
@@ -200,7 +214,7 @@ $(function() {
 
             pc.addTransceiver('video', {direction: 'recvonly'})
             pc.addEventListener('track', (event) => {
-                console.log(`track event: ${event.track.kind}`)
+                log(`track event: ${event.track.kind}`)
                 if (event.track.kind === 'video') {
                     video.srcObject = event.streams[0]
                 }
@@ -251,10 +265,10 @@ $(function() {
                 })
             }).then((response) => {
                 return response.json()
-            }).catch((error) => {
-                console.error("Error loading WebRTC Stream")
-                console.error(error)
-                console.warn("Falling back to mjpg")
+            }).catch((err) => {
+                error("Error loading WebRTC Stream")
+                error(err)
+                warn("Falling back to mjpg")
                 self.startMjpg()
             })
         }
@@ -262,7 +276,7 @@ $(function() {
         self.stopWebRTC = function () {
             // TODO don't stop the stream if playing in PIP mode
 
-            console.log("Stopping WebRTC stream")
+            log("Stopping WebRTC stream")
             self.currentMode("")
             if (self.webrtcPC === null) {
                 return
