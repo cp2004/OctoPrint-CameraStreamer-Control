@@ -1,10 +1,7 @@
-{# TODO some pretty CSS to style this nicely #}
-
-<div class="nowebcam">
-    <div class="text webcam_error">
-        <p><strong>{{ _('Webcam stream not loaded') }}</strong></p>
-        <p data-bind="visible: !loginState.isAdmin()"><small>{{ _('It might not be configured correctly or require authentication. To have this fixed, get in touch with an administrator of this OctoPrint instance.') }}</small></p>
-        <p data-bind="visible: loginState.isAdmin"><small>{{ _('It might not be configured correctly or require authentication. You can change the URL of the stream under "Settings" > "Camera Streamer Control" > "Stream URL". If you don\'t have a webcam you can also just disable webcam support there.') }}</small></p>
-        <p data-bind="visible: loginState.isUser"><small>{{ _('Currently configured stream URL') }}: <a target="_blank" rel="noreferrer" {# TODO data-bind="attr: {href: settings.streamUrl}, text: settings.streamUrl" #}></a></small></p>
-    </div>
+<div class="webcam_error">
+    <i class="fas fa-triangle-exclamation fa-4x text-warning"></i>
+    <h4>{{ _('Webcam stream not loaded') }}</h4>
+    <p data-bind="visible: !loginState.isAdmin()"><small>{{ _('It might not be configured correctly or require authentication. To have this fixed, get in touch with an administrator of this OctoPrint instance.') }}</small></p>
+    <p data-bind="visible: loginState.isAdmin"><small>{{ _('It might not be configured correctly or require authentication. You can change the URL of the stream under "Settings" > "Camera Streamer Control" > "Stream URL". If you don\'t have a webcam you can also just disable webcam support in the \'Webcam and Timelapse\' section of OctoPrint\'s settings.') }}</small></p>
+    <p data-bind="visible: loginState.isUser"><small>{{ _('Currently configured stream URL') }}: <a target="_blank" rel="noreferrer" data-bind="attr: {href: settingsViewModel.settings.plugins.camerastreamer_control.url}, text: settingsViewModel.settings.plugins.camerastreamer_control.url"></a></small></p>
 </div>

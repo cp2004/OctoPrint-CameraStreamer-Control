@@ -1,0 +1,11 @@
+#webcam_plugin_camerastreamer_control {
+  .webcam_error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    padding: 1rem;
+  }
+}
