@@ -13,13 +13,11 @@ $(function() {
         /* TODO list
          *  Bugs:
          *  * Intersection observer doesn't seem to like me scrolling on the page, sends signal to unload the stream. why? doesn't seem to do it with classicam
-         *  * Doesn't always seem to load stream on first load, no webcam mode gets selected
          *  Goal 1: Support Mjpg & WebRTC streams smoothly for one camera
          *  * timeout if webrtc doesn't load
          *  * Show warning if fallen back to mjpg
          *  * Smooth settings configuration
          *  * WebRTC stun make it a comma separated list
-         *  Goal 2: Support snapshots for one camera (can then disable classicwebcam)
          *  Goal 3: Support multiple camera-streamer cameras
          *  Finally: sort out logging
          */
@@ -38,7 +36,12 @@ $(function() {
         self.streamStopTimer = null
 
         self.onWebcamVisibilityChange = function (visible) {
-            console.log("CSC Webcam visibility changed: " + visible)
+            const current = self.webcamVisible()
+            if (current === visible) {
+                // Likely first load when we get sent `false` for the first time, but we default to false
+                return
+            }
+
             self.webcamVisible(visible)
             if (visible) {
                 self.startStream()
