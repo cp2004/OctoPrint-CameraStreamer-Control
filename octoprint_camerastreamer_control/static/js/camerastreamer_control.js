@@ -43,8 +43,16 @@ $(function() {
         }
 
         self.webcamVisible = ko.observable(false)
+        self.webcamPiP = ko.observable(false)
         self.currentMode = ko.observable("")
         self.streamStopTimer = null
+
+        self.webcamPiP.subscribe((enabled) => {
+            if (!enabled && !self.webcamVisible()) {
+                // Stop stream if PiP disabled and webcam not visible
+                self.stopStream()
+            }
+        })
 
         self.onWebcamVisibilityChange = function (visible) {
             const current = self.webcamVisible()
@@ -58,7 +66,10 @@ $(function() {
             if (visible) {
                 self.startStream()
             } else {
-                self.stopStream()
+                // If PiP active we don't want to stop the stream
+                if (!self.webcamPiP()) {
+                    self.stopStream()
+                }
             }
         }
 
@@ -199,6 +210,15 @@ $(function() {
             log("Starting WebRTC stream from " + self.getSetting("url")())
 
             const video = document.getElementById(id("webrtc_video"))
+
+            // Add PiP status listener
+            // TODO not needed when using custom controls for rotation
+            video.addEventListener('enterpictureinpicture', () => {
+                self.webcamPiP(true)
+            })
+            video.addEventListener('leavepictureinpicture', () => {
+                self.webcamPiP(false)
+            })
 
             // Heavily inspired by the camera-streamer page implementing webrtc, this does the same thing
             // https://github.com/ayufan/camera-streamer/blob/cdb62efd931b8bde5ab49d5319091714f48027b1/html/webrtc.html
