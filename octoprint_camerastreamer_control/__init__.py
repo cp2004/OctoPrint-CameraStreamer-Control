@@ -16,7 +16,7 @@ class CameraStreamerControlPlugin(
     _capture_mutex = threading.Lock()
 
     def take_webcam_snapshot(self, _):
-        snapshot_url = f"{self._settings.get(['url']).rstrip('/')}/snapshot"
+        snapshot_url = f"{self._settings.get(['url']).rstrip('/')}/{self._settings.get(['snapshot', 'url'])}"
 
         if not snapshot_url.startswith("http"):
             snapshot_url = f"http://127.0.0.1/{snapshot_url.lstrip('/')}"
@@ -26,8 +26,8 @@ class CameraStreamerControlPlugin(
             r = requests.get(
                 snapshot_url,
                 stream=True,
-                timeout=self._settings.get_int(["snapshotTimeout"]),
-                verify=self._settings.get_boolean(["snapshotSslValidationtate90"]),
+                timeout=self._settings.get_int(["snapshot", "timeout"]),
+                verify=self._settings.get_boolean(["snapshot", "validate_ssl"]),
             )
             r.raise_for_status()
             return r.iter_content(chunk_size=1024)

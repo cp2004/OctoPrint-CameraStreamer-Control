@@ -63,10 +63,19 @@
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="{{ macros.id("timeout") }}">Timeout</label>
+        <label class="control-label" for="{{ macros.id("timeout") }}">Stream Timeout</label>
         <div class="controls">
             <div class="input-append">
                 <input type="number" class="input-mini text-right" id="{{ macros.id("timeout") }}" data-bind="value: {{ macros.settings_binding("timeout") }}" />
+                <span class="add-on">sec</span>
+            </div>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="{{ macros.id("snapshot-timeout") }}">Snapshot Timeout</label>
+        <div class="controls">
+            <div class="input-append">
+                <input type="number" class="input-mini text-right" id="{{ macros.id("snapshot-timeout") }}" data-bind="value: {{ macros.settings_binding("snapshot.timeout") }}" />
                 <span class="add-on">sec</span>
             </div>
         </div>
@@ -87,6 +96,16 @@
             <input type="text" id="{{ macros.id("webrtc-url") }}" data-bind="value: {{ macros.settings_binding("webrtc.url") }}" />
             <div class="help-block">
                 <p><em>Extension to the webcam URL above to use for the WebRTC video stream</em></p>
+                <p><em>You should not normally have to change this</em></p>
+            </div>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="{{ macros.id("snapshot-url") }}">Snapshot URL</label>
+        <div class="controls">
+            <input type="text" id="{{ macros.id("snapshot-url") }}" data-bind="value: {{ macros.settings_binding("snapshot.url") }}" />
+            <div class="help-block">
+                <p><em>Extension to the webcam URL above to use for snapshot capture</em></p>
                 <p><em>You should not normally have to change this</em></p>
             </div>
         </div>
