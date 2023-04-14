@@ -47,6 +47,13 @@ $(function() {
         self.currentMode = ko.observable("")
         self.streamStopTimer = null
 
+        self.webcamClass = ko.pureComputed(() => {
+            const flipH = self.getSetting("flipH")() ? 'csc-flipH' : ''
+            const flipV = self.getSetting("flipV")() ? 'csc-flipV' : ''
+            const rotate90 = self.getSetting("rotate90")() ? 'csc-rotate90' : ''
+            return `${flipH} ${flipV} ${rotate90}`
+        })
+
         self.webcamPiP.subscribe((enabled) => {
             if (!enabled && !self.webcamVisible()) {
                 // Stop stream if PiP disabled and webcam not visible
@@ -294,8 +301,6 @@ $(function() {
         }
 
         self.stopWebRTC = function () {
-            // TODO don't stop the stream if playing in PIP mode
-
             log("Stopping WebRTC stream")
             self.currentMode("")
             if (self.webrtcPC === null) {

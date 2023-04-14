@@ -1,9 +1,11 @@
 {% import "macros.jinja2" as macros %}
 
 <div id="{{ macros.id("mjpg_container") }}">
-    <div id="{{ macros.id("mjpg_rotator") }}" {# data-bind="css: {webcam_rotated: settings.rotate90(), webcam_unrotated: !settings.rotate90()}" #}>
+    <div data-bind="class: webcamClass" {# data-bind="css: {webcam_rotated: settings.rotate90(), webcam_unrotated: !settings.rotate90()}" #}>
         <div class="{{ macros.id("mjpg_ratio") }}" {# data-bind="css: webcamRatioClass" #}>
-            <img alt="Webcam View" id="{{ macros.id("mjpg_image") }}" data-bind="event: {load: onMjpgLoaded, error: onMjpgError }">
+            <div>
+                <img src="" alt="Webcam View" id="{{ macros.id("mjpg_image") }}" data-bind="event: {load: onMjpgLoaded, error: onMjpgError }">
+            </div>
         </div>
     </div>
 </div>
