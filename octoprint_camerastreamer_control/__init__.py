@@ -36,16 +36,21 @@ class CameraStreamerControlPlugin(
         return {
             "mode": "webrtc",
             "url": "/webcam/",
-            "show_warning": True,
             "flipH": False,
             "flipV": False,
             "rotate90": False,
             "timeout": 5,
-            "ratio": "16:9",
+            "ratio": "16:9",  # TODO not used anywhere?
             "webrtc": {
+                "url": "webrtc",
                 "stun": "stun:stun.l.google.com:19302",
             },
+            "mjpg": {
+                "url": "stream",
+                "cacheBuster": False,
+            },
             "snapshot": {
+                "url": "snapshot",
                 "timeout": 5,
                 "validate_ssl": True,
             }

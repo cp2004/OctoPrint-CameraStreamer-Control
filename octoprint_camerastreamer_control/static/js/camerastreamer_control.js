@@ -37,9 +37,21 @@ $(function() {
         self.settingsViewModel = parameters[0];
         self.loginState = parameters[1];
 
-        self.getSetting = function (name) {
-            // TODO work with nested settings
-            return self.settingsViewModel.settings.plugins.camerastreamer_control[name]
+        self.getSetting = function (path) {
+            const setting_path = []
+            if (typeof path === "string") {
+                setting_path.push(path)
+            } else {
+                setting_path.push(...path)
+            }
+
+            let current = self.settingsViewModel.settings.plugins.camerastreamer_control
+
+            setting_path.forEach((setting) => {
+                current = current[setting]
+            })
+
+            return current
         }
 
         self.webcamVisible = ko.observable(false)
@@ -175,7 +187,7 @@ $(function() {
             // TODO safari bug workaround
 
             // Camera streamer uses `stream` or `?action=stream`
-            const newsrc = `${self.getSetting("url")()}stream`
+            const newsrc = self.getSetting("url")() + self.getSetting(["mjpg", "url"])()
 
             if (currentsrc !== newsrc) {
                 // TODO cache buster
@@ -247,7 +259,7 @@ $(function() {
                 }
             })
 
-            const url = `${self.getSetting("url")()}webrtc`
+            const url = self.getSetting("url")() + self.getSetting(["webrtc", "url"])()
 
             fetch(url, {
                 body: JSON.stringify({

@@ -5,10 +5,8 @@
 <p>
     This plugin enables some configuration of the extra features that come with OctoPi's
     <a href="https://github.com/ayufan/camera-streamer" target="_blank" rel="noreferrer">camera-streamer</a>
-    implementation.
+    implementation, beyond the classic MJPG stream.
 </p>
-
-
 
 {# Check for OctoPi installation of camera-streamer #}
 {% if not "plugin_camerastreamer_control_installed" %}
@@ -16,7 +14,7 @@
     <p>
         <strong>It looks like camera-streamer is not installed</strong>
         <br/>
-        This plugin will likely not work on your install.
+        This plugin might not work on your install.
     </p>
 </div>
 {% endif %}
@@ -28,23 +26,70 @@
         <label class="control-label" for="{{ macros.id("mode") }}">Preferred Video Mode</label>
         <div class="controls">
             <select id="{{ macros.id("mode") }}" data-bind="value: {{ macros.settings_binding("mode") }}">
-                <option value="mjpg">Mjpg</option>
+                <option value="mjpg">MJPG</option>
                 <option value="webrtc">WebRTC (experimental)</option>
-                <option value="mp4">MP4</option>
+                {# TODO implement these options I guess #}
+                {# <option value="mp4">MP4</option>
                 <option value="mkv">MKV</option>
-                <option value="hls">HLS</option>
+                <option value="hls">HLS</option> #}
             </select>
+            <em class="help-block" data-bind="visible: {{ macros.settings_binding("mode") }}() !== 'mjpg'">
+                If the preferred video mode fails to connect, it will fall back to MJPG mode.
+            </em>
         </div>
-        <em class="help-inline" data-bind="visible: {{ macros.settings_binding("mode") }}() !== 'mjpg'">
-            If the preferred video mode fails to connect, it will fall back to Mjpg mode.
-        </em>
     </div>
     <div class="control-group">
-        <label class="control-label" for="{{ macros.id("url") }}">Stream URL</label>
+        <label class="control-label" for="{{ macros.id("url") }}">Webcam URL</label>
         <div class="controls">
             <input type="text" id="{{ macros.id("url") }}" data-bind="value: {{ macros.settings_binding("url") }}" />
+            <em class="help-block">You should not normally have to change this</em>
         </div>
-        <em class="help-block">You should not normally have to change this</em>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+           <label class="checkbox" for="{{ macros.id("flipH") }}">
+               <input type="checkbox" id="{{ macros.id("flipH") }}" data-bind="checked: {{ macros.settings_binding("flipH") }}" /> Flip Horizontally
+           </label>
+        </div>
+        <div class="controls">
+           <label class="checkbox" for="{{ macros.id("flipV") }}">
+               <input type="checkbox" id="{{ macros.id("flipV") }}" data-bind="checked: {{ macros.settings_binding("flipV") }}" /> Flip Vertically
+           </label>
+        </div>
+        <div class="controls">
+           <label class="checkbox" for="{{ macros.id("rotate90") }}">
+               <input type="checkbox" id="{{ macros.id("rotate90") }}" data-bind="checked: {{ macros.settings_binding("rotate90") }}" /> Rotate 90 degrees counter clockwise
+           </label>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="{{ macros.id("timeout") }}">Timeout</label>
+        <div class="controls">
+            <div class="input-append">
+                <input type="number" class="input-mini text-right" id="{{ macros.id("timeout") }}" data-bind="value: {{ macros.settings_binding("timeout") }}" />
+                <span class="add-on">sec</span>
+            </div>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="{{ macros.id("mjpg-url") }}">MJPG Video URL</label>
+        <div class="controls">
+            <input type="text" id="{{ macros.id("mjpg-url") }}" data-bind="value: {{ macros.settings_binding("mjpg.url") }}" />
+            <div class="help-block">
+                <p><em>Extension to the webcam URL above to use for the MJPG video stream</em></p>
+                <p><em>You should not normally have to change this</em></p>
+            </div>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="{{ macros.id("webrtc-url") }}">WebRTC Video URL</label>
+        <div class="controls">
+            <input type="text" id="{{ macros.id("webrtc-url") }}" data-bind="value: {{ macros.settings_binding("webrtc.url") }}" />
+            <div class="help-block">
+                <p><em>Extension to the webcam URL above to use for the WebRTC video stream</em></p>
+                <p><em>You should not normally have to change this</em></p>
+            </div>
+        </div>
     </div>
 </div>
 
