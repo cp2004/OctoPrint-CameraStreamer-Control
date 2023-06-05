@@ -123,7 +123,7 @@ class CameraStreamerControlPlugin(
                     streamTimeout=self._settings.get_int(["timeout"]),
                     streamRatio=self._settings.get(["ratio"]),
                     streamWebrtcIceServers=[self._settings.get(["webrtc", "stun"])],
-                    snapshot=f"{self._settings.get(['url']).rstrip()}/snapshot",
+                    snapshot=snapshot_url,
                     snapshotTimeout=self._settings.get(["snapshot", "timeout"]),
                     snapshotSslValidation=self._settings.get(["snapshot", "validate_ssl"])
                 )
