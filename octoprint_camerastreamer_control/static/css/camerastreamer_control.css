@@ -62,3 +62,9 @@
   -ms-transform: scaleY(-1);
   transform: scaleY(-1);
 }
+#webcam_plugin_camerastreamer_control .csc-flipV.csc-flipH {
+  -webkit-transform: scaleX(-1) scaleY(-1);
+  -moz-transform: scaleX(-1) scaleY(-1);
+  -ms-transform: scaleX(-1) scaleY(-1);
+  transform: scaleX(-1) scaleY(-1);
+}

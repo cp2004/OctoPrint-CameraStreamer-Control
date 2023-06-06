@@ -329,7 +329,6 @@ $(function() {
         }
 
         self.rotateVideo = function () {
-            log(`Rotating video ${self.getSetting("rotate90")()}`)
             const video = document.getElementById(id("webrtc_video"))
             const rotation_container = document.getElementById(id("webrtc_container"))
 
