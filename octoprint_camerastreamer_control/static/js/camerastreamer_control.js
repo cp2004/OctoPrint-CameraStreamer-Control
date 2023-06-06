@@ -124,13 +124,13 @@ $(function() {
             try {
                 if (!(mode in map)) {
                     error("Unknown video mode: " + mode)
-                    fallback()
+                    self.fallback()
                 }
                 map[mode]()
             } catch (err) {
                 error("Error starting stream: " + mode)
                 error(err)
-                fallback()
+                self.fallback()
             }
         }
 
