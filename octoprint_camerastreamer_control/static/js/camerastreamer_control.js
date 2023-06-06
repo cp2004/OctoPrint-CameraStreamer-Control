@@ -25,7 +25,6 @@ $(function() {
          *  * Intersection observer doesn't seem to like me scrolling on the page, sends signal to unload the stream. why? doesn't seem to do it with classicam
          *  Goal 1: Support Mjpg & WebRTC streams smoothly for one camera
          *  * timeout if webrtc doesn't load
-         *  * Show warning if fallen back to mjpg
          *  * Smooth settings configuration
          *  * WebRTC stun make it a comma separated list
          *  Goal 2: Support multiple camera-streamer cameras - this is stretch goal for future
@@ -57,6 +56,7 @@ $(function() {
         self.webcamPiP = ko.observable(false)
         self.currentMode = ko.observable("")
         self.streamStopTimer = null
+        self.fallbackError = ko.observable(false)
 
         self.webcamClass = ko.pureComputed(() => {
             const flipH = self.getSetting("flipH")() ? 'csc-flipH' : ''
@@ -114,6 +114,7 @@ $(function() {
             }
 
             log("Starting stream")
+            self.fallbackError(false)
 
             // Try starting the preferred video method
             const map = {
@@ -122,11 +123,6 @@ $(function() {
             }
 
             const mode = self.settingsViewModel.settings.plugins.camerastreamer_control.mode()
-
-            const fallback = () => {
-                warn("Falling back to mjpg")
-                self.startMjpg()
-            }
 
             try {
                 if (!(mode in map)) {
@@ -139,6 +135,12 @@ $(function() {
                 error(err)
                 fallback()
             }
+        }
+
+        self.fallback = function () {
+            warn("Falling back to mjpg")
+            self.fallbackError(true)
+            self.startMjpg()
         }
 
         self.stopStream = function (force) {
@@ -317,8 +319,7 @@ $(function() {
             }).catch((err) => {
                 error("Error loading WebRTC Stream")
                 error(err)
-                warn("Falling back to mjpg")
-                self.startMjpg()
+                self.fallback()
             })
         }
 

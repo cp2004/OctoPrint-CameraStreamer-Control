@@ -1,5 +1,9 @@
 {% import "macros.jinja2" as macros %}
-
+<div class="csc-video-controls btn-group" data-bind="visible: fallbackError">
+    <div class="btn disabled">
+        <i class="fa-solid fa-warning text-error fa-2x" title="Failed to load WebRTC stream"></i>
+    </div>
+</div>
 <div id="{{ macros.id("mjpg_container") }}">
     <div data-bind="class: webcamClass" {# data-bind="css: {webcam_rotated: settings.rotate90(), webcam_unrotated: !settings.rotate90()}" #}>
         <div class="{{ macros.id("mjpg_ratio") }}" {# data-bind="css: webcamRatioClass" #}>
