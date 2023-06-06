@@ -245,8 +245,10 @@ $(function() {
                 // TODO this is a hack because the video pauses when we switch tabs but I don't know
                 //  what is triggering the pause
                 // So we'll just play it again :)
-                warn("Video paused, playing again")
-                e.target.play()
+                if (self.webcamPiP()){
+                    e.target.play()
+                    warn("Video paused but we're PiP, playing again")
+                }
             })
             // Add size change listener to rotate the video
             video.onresize = self.rotateVideo
