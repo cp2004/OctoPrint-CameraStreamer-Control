@@ -12,25 +12,43 @@
   color: white;
   padding: 1rem;
 }
-#webcam_plugin_camerastreamer_control .csc-rotate90 {
+#webcam_plugin_camerastreamer_control #camerastreamer_control_webrtc_video {
+  width: 100%;
+  height: 100%;
+}
+#webcam_plugin_camerastreamer_control #camerastreamer_control_mjpg_container.csc-rotate90 {
   position: relative;
   width: 100%;
   padding-bottom: 100%;
 }
-#webcam_plugin_camerastreamer_control .csc-rotate90 > div {
+#webcam_plugin_camerastreamer_control #camerastreamer_control_mjpg_container.csc-rotate90 > div {
   position: absolute;
   transform: rotate(-90deg);
   top: 0;
   bottom: 0;
 }
-#webcam_plugin_camerastreamer_control .csc-rotate90 > div > div {
+#webcam_plugin_camerastreamer_control #camerastreamer_control_mjpg_container.csc-rotate90 > div > div {
   width: 100%;
   height: 100%;
 }
-#webcam_plugin_camerastreamer_control .csc-rotate90 > div > div > img {
+#webcam_plugin_camerastreamer_control #camerastreamer_control_mjpg_container.csc-rotate90 > div > div > img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+#webcam_plugin_camerastreamer_control #camerastreamer_control_webrtc_container.csc-rotate90 {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+#webcam_plugin_camerastreamer_control #camerastreamer_control_webrtc_container.csc-rotate90 video {
+  position: absolute;
+  transform: rotate(-90deg);
+  width: 100%;
 }
 #webcam_plugin_camerastreamer_control .csc-flipH {
   -webkit-transform: scaleX(-1);

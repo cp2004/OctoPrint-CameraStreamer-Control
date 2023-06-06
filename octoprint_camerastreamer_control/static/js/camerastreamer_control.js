@@ -23,13 +23,13 @@ $(function() {
         /* TODO list
          *  Bugs:
          *  * Intersection observer doesn't seem to like me scrolling on the page, sends signal to unload the stream. why? doesn't seem to do it with classicam
+         *  * PiP doesn't work when switching tabs or returning to OctoPrint's tab
          *  Goal 1: Support Mjpg & WebRTC streams smoothly for one camera
          *  * timeout if webrtc doesn't load
          *  * Show warning if fallen back to mjpg
          *  * Smooth settings configuration
          *  * WebRTC stun make it a comma separated list
-         *  * Flip & rotate
-         *  Goal 3: Support multiple camera-streamer cameras
+         *  Goal 2: Support multiple camera-streamer cameras - this is stretch goal for future
          *  Finally: sort out logging
          */
         var self = this;
@@ -103,7 +103,7 @@ $(function() {
 
         self.startStream = function () {
             if (self.streamStopTimer !== null) {
-                // We were timing out to stop the stream, but we don't need to anymore.
+                // We were timing out to stop the stream, but we don't need to any more.
                 // So just clear the timeout and do nothing
                 log("Aborting timeout")
                 clearTimeout(self.streamStopTimer)
@@ -238,6 +238,8 @@ $(function() {
             video.addEventListener('leavepictureinpicture', () => {
                 self.webcamPiP(false)
             })
+            // Add size change listener to rotate the video
+            video.onresize = self.rotateVideo
 
             // Heavily inspired by the camera-streamer page implementing webrtc, this does the same thing
             // https://github.com/ayufan/camera-streamer/blob/cdb62efd931b8bde5ab49d5319091714f48027b1/html/webrtc.html
@@ -294,7 +296,7 @@ $(function() {
             }).then((answer) => {
                 const offer = pc.localDescription
 
-                return fetch(url,{
+                return fetch(url, {
                     body: JSON.stringify({
                         type: offer.type,
                         id: pc.remote_pc_id,
@@ -318,11 +320,40 @@ $(function() {
             if (self.webrtcPC === null) {
                 return
             }
-
             self.webrtcPC.close()
         }
-    }
 
+        self.onAfterBinding = function() {
+            // If rotation changes, might need to re-adjust video size
+            self.getSetting("rotate90").subscribe(self.rotateVideo)
+        }
+
+        self.rotateVideo = function () {
+            log(`Rotating video ${self.getSetting("rotate90")()}`)
+            const video = document.getElementById(id("webrtc_video"))
+            const rotation_container = document.getElementById(id("webrtc_container"))
+
+            if (!video) {
+                // Webrtc video not enabled/not streaming, nothing to do
+                return
+            }
+
+            if (self.getSetting("rotate90")()) {
+                // Make the container square
+                rotation_container.style.height = rotation_container.offsetWidth + "px"
+                // Remove the initial padding we gave the element from css.
+                rotation_container.style.paddingBottom = '0';
+                // Swap height and width
+                video.style.height = rotation_container.offsetWidth + "px"
+                video.style.width = rotation_container.offsetHeight + "px"
+            } else {
+                rotation_container.style.height = ""
+                rotation_container.style.paddingBottom = "";
+                video.style.height = ""
+                video.style.width = ""
+            }
+        }
+    }
     OCTOPRINT_VIEWMODELS.push({
         construct: CameraStreamerControlViewModel,
         dependencies: ["settingsViewModel", "loginStateViewModel"],
