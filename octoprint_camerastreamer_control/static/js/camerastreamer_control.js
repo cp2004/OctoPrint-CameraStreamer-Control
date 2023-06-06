@@ -21,12 +21,9 @@ $(function() {
 
     function CameraStreamerControlViewModel(parameters) {
         /* TODO list
-         *  Bugs:
-         *  * Intersection observer doesn't seem to like me scrolling on the page, sends signal to unload the stream. why? doesn't seem to do it with classicam
          *  Goal 1: Support Mjpg & WebRTC streams smoothly for one camera
          *  * timeout if webrtc doesn't load
          *  * Smooth settings configuration
-         *  * WebRTC stun make it a comma separated list
          *  Goal 2: Support multiple camera-streamer cameras - this is stretch goal for future
          *  Finally: sort out logging
          */
@@ -255,14 +252,13 @@ $(function() {
 
             // Heavily inspired by the camera-streamer page implementing webrtc, this does the same thing
             // https://github.com/ayufan/camera-streamer/blob/cdb62efd931b8bde5ab49d5319091714f48027b1/html/webrtc.html
-            const config = {
+
+            const pc = new RTCPeerConnection({
                 sdpSemantics: 'unified-plan',
                 iceServers: [  //  TODO configurable as comma separated list
-                    {urls: self.settingsViewModel.settings.plugins.camerastreamer_control.webrtc.stun()},
+                    {urls: self.getSetting(["webrtc", "stun"])().split(",").map(url => url.trim())},
                 ]
-            }
-
-            const pc = new RTCPeerConnection(config)
+            })
             self.webrtcPC = pc
 
             pc.addTransceiver('video', {direction: 'recvonly'})
