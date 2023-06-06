@@ -231,7 +231,6 @@ $(function() {
             const video = document.getElementById(id("webrtc_video"))
 
             // Add PiP status listener
-            // TODO not needed when using custom controls for rotation
             video.addEventListener('enterpictureinpicture', () => {
                 self.webcamPiP(true)
             })
@@ -351,6 +350,23 @@ $(function() {
                 video.style.height = ""
                 video.style.width = ""
             }
+        }
+
+        // Video controls
+        self.reloadStream = function () {
+            // Might be useful if the stream is stuck
+            self.stopStream(true)
+            self.startStream()
+        }
+
+        self.fullscreen = function () {
+            const video = document.getElementById(id("webrtc_video"))
+            video.requestFullscreen()
+        }
+
+        self.togglePiP = function () {
+            const video = document.getElementById(id("webrtc_video"))
+            video.requestPictureInPicture()
         }
     }
     OCTOPRINT_VIEWMODELS.push({

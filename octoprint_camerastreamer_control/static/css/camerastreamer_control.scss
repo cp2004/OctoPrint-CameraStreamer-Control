@@ -84,4 +84,16 @@
     -ms-transform: scaleX(-1) scaleY(-1);
     transform: scaleX(-1) scaleY(-1);
   }
+
+  .csc-video-controls {
+    position: absolute;
+    bottom: 0;
+    right: 8px;
+    z-index: 10;
+    opacity: .4;
+  }
+  &:hover .csc-video-controls {
+    transition: 0.3s;  // Aligns with the nav transition
+    opacity: 1;
+  }
 }

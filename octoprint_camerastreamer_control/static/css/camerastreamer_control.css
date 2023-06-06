@@ -68,3 +68,14 @@
   -ms-transform: scaleX(-1) scaleY(-1);
   transform: scaleX(-1) scaleY(-1);
 }
+#webcam_plugin_camerastreamer_control .csc-video-controls {
+  position: absolute;
+  bottom: 0;
+  right: 8px;
+  z-index: 10;
+  opacity: 0.4;
+}
+#webcam_plugin_camerastreamer_control:hover .csc-video-controls {
+  transition: 0.3s;
+  opacity: 1;
+}
