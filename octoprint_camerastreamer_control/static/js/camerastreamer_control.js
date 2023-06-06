@@ -4,9 +4,18 @@
  * Author: Charlie Powell
  * License: AGPLv3
  */
+
+const ENABLE_DEBUG = false
+
 $(function() {
     function id(name) {
         return `camerastreamer_control_${name}`
+    }
+
+    const debug = (msg) => {
+        if (ENABLE_DEBUG) {
+            log(msg)
+        }
     }
 
     const log = (msg) => {
@@ -76,7 +85,7 @@ $(function() {
                 return
             }
 
-            log("Webcam visibility changed: " + visible)
+            debug("Webcam visibility changed: " + visible)
 
             self.webcamVisible(visible)
             if (self.webcamPiP()) {
@@ -104,13 +113,13 @@ $(function() {
             if (self.streamStopTimer !== null) {
                 // We were timing out to stop the stream, but we don't need to any more.
                 // So just clear the timeout and do nothing
-                log("Aborting timeout")
+                debug("Aborting timeout")
                 clearTimeout(self.streamStopTimer)
                 self.streamStopTimer = null
                 return
             }
 
-            log("Starting stream")
+            debug("Starting stream")
             self.fallbackError(false)
 
             // Try starting the preferred video method
@@ -145,7 +154,7 @@ $(function() {
                 // Set a timeout to stop the stream, so it doesn't stop and start too quickly
                 const timeout = self.getSetting("timeout")() * 1000
 
-                log(`Stopping stream in ${timeout / 1000} seconds`)
+                debug(`Stopping stream in ${timeout / 1000} seconds`)
 
 
                 if (self.streamStopTimer !== null) {
@@ -160,7 +169,7 @@ $(function() {
                 return
             }
 
-            log("Stopping stream")
+            debug("Stopping stream")
 
             const map = {
                 'mjpg': self.stopMjpg,
@@ -180,7 +189,7 @@ $(function() {
 
         self.startMjpg = function () {
             self.currentMode("mjpg")
-            log("Starting MJPG stream from " + self.getSetting("url")())
+            debug("Starting MJPG stream from " + self.getSetting("url")())
 
             const element = document.getElementById(id("mjpg_image"))
             const currentsrc = element.getAttribute("src")
@@ -192,7 +201,7 @@ $(function() {
 
             if (currentsrc !== newsrc) {
                 // TODO cache buster
-                log("Setting new MJPG stream: " + newsrc)
+                debug("Setting new MJPG stream: " + newsrc)
                 element.setAttribute("src", newsrc)
             }
         }
@@ -227,7 +236,7 @@ $(function() {
             }
 
             self.currentMode("webrtc")
-            log("Starting WebRTC stream from " + self.getSetting("url")())
+            debug("Starting WebRTC stream from " + self.getSetting("url")())
 
             const video = document.getElementById(id("webrtc_video"))
 
@@ -263,7 +272,7 @@ $(function() {
 
             pc.addTransceiver('video', {direction: 'recvonly'})
             pc.addEventListener('track', (event) => {
-                log(`track event: ${event.track.kind}`)
+                debug(`track event: ${event.track.kind}`)
                 if (event.track.kind === 'video') {
                     video.srcObject = event.streams[0]
                 }
@@ -322,7 +331,7 @@ $(function() {
         }
 
         self.stopWebRTC = function () {
-            log("Stopping WebRTC stream")
+            debug("Stopping WebRTC stream")
             self.currentMode("")
             self.webcamPiP(false)
             if (self.webrtcPC === null) {
