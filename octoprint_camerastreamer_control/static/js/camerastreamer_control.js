@@ -23,7 +23,6 @@ $(function() {
         /* TODO list
          *  Bugs:
          *  * Intersection observer doesn't seem to like me scrolling on the page, sends signal to unload the stream. why? doesn't seem to do it with classicam
-         *  * PiP doesn't work when switching tabs or returning to OctoPrint's tab
          *  Goal 1: Support Mjpg & WebRTC streams smoothly for one camera
          *  * timeout if webrtc doesn't load
          *  * Show warning if fallen back to mjpg
@@ -81,14 +80,17 @@ $(function() {
             }
 
             log("Webcam visibility changed: " + visible)
+
             self.webcamVisible(visible)
+            if (self.webcamPiP()) {
+                // Playing in PiP mode - leave it alone
+                // Don't stop or start the stream
+                return
+            }
             if (visible) {
                 self.startStream()
             } else {
-                // If PiP active we don't want to stop the stream
-                if (!self.webcamPiP()) {
-                    self.stopStream()
-                }
+                self.stopStream()
             }
         }
 
@@ -237,6 +239,13 @@ $(function() {
             video.addEventListener('leavepictureinpicture', () => {
                 self.webcamPiP(false)
             })
+            video.addEventListener('pause', (e) => {
+                // TODO this is a hack because the video pauses when we switch tabs but I don't know
+                //  what is triggering the pause
+                // So we'll just play it again :)
+                warn("Video paused, playing again")
+                e.target.play()
+            })
             // Add size change listener to rotate the video
             video.onresize = self.rotateVideo
 
@@ -316,6 +325,7 @@ $(function() {
         self.stopWebRTC = function () {
             log("Stopping WebRTC stream")
             self.currentMode("")
+            self.webcamPiP(false)
             if (self.webrtcPC === null) {
                 return
             }

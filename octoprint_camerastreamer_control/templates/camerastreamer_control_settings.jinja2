@@ -47,20 +47,24 @@
     </div>
     <div class="control-group">
         <div class="controls">
-           <label class="checkbox" for="{{ macros.id("flipH") }}">
-               <input type="checkbox" id="{{ macros.id("flipH") }}" data-bind="checked: {{ macros.settings_binding("flipH") }}" /> Flip Horizontally
-           </label>
+            <label class="checkbox" for="{{ macros.id("flipH") }}">
+                <input type="checkbox" id="{{ macros.id("flipH") }}" data-bind="checked: {{ macros.settings_binding("flipH") }}" /> Flip Horizontally
+            </label>
         </div>
         <div class="controls">
-           <label class="checkbox" for="{{ macros.id("flipV") }}">
-               <input type="checkbox" id="{{ macros.id("flipV") }}" data-bind="checked: {{ macros.settings_binding("flipV") }}" /> Flip Vertically
-           </label>
+            <label class="checkbox" for="{{ macros.id("flipV") }}">
+                <input type="checkbox" id="{{ macros.id("flipV") }}" data-bind="checked: {{ macros.settings_binding("flipV") }}" /> Flip Vertically
+            </label>
         </div>
         <div class="controls">
-           <label class="checkbox" for="{{ macros.id("rotate90") }}">
-               <input type="checkbox" id="{{ macros.id("rotate90") }}" data-bind="checked: {{ macros.settings_binding("rotate90") }}" /> Rotate 90 degrees counter clockwise
-           </label>
+            <label class="checkbox" for="{{ macros.id("rotate90") }}">
+                <input type="checkbox" id="{{ macros.id("rotate90") }}" data-bind="checked: {{ macros.settings_binding("rotate90") }}" /> Rotate 90 degrees counter clockwise
+            </label>
+            <em class="help-block" data-bind="visible: {{ macros.settings_binding("flipH") }}() || {{ macros.settings_binding("flipV") }}() || {{ macros.settings_binding("rotate90") }}()">
+                <i class="fas fa-triangle-exclamation text-warning"></i> Flip & rotate options don't work with picture-in-picture viewing.
+            </em>
         </div>
+
     </div>
     <div class="control-group">
         <label class="control-label" for="{{ macros.id("timeout") }}">Stream Timeout</label>
