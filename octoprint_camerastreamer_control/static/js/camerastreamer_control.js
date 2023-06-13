@@ -262,64 +262,62 @@ $(function() {
             // Add size change listener to rotate the video
             video.onresize = self.rotateVideo
 
-            // Heavily inspired by the camera-streamer page implementing webrtc, this does the same thing
-            // https://github.com/ayufan/camera-streamer/blob/cdb62efd931b8bde5ab49d5319091714f48027b1/html/webrtc.html
-
-            const pc = new RTCPeerConnection({
-                sdpSemantics: 'unified-plan',
-                iceServers: [
-                    {urls: self.getSetting(["webrtc", "stun"])().split(",").map(url => url.trim())},
-                ]
-            })
-            self.webrtcPC = pc
-
-            pc.addTransceiver('video', {direction: 'recvonly'})
-            pc.addEventListener('track', (event) => {
-                debug(`track event: ${event.track.kind}`)
-                if (event.track.kind === 'video') {
-                    video.srcObject = event.streams[0]
-                }
-            })
+            const iceServers = self.getSetting(["webrtc", "stun"])().split(",").map(url => url.trim())
 
             const url = self.getSetting("url")() + self.getSetting(["webrtc", "url"])()
 
             fetch(url, {
                 body: JSON.stringify({
                     type: 'request',
+                    iceServers: iceServers,
                 }),
                 method: 'POST',
                 // todo abort fetch with AbortController
             }).then((response) => {
                 return response.json()
             }).then((answer) => {
+                self.webrtcPC = new RTCPeerConnection({
+                    sdpSemantics: 'unified-plan',
+                    iceServers: answer.iceServers || [{urls: iceServers}],  // Old versions of CS don't return ice_servers
+                })
+                const pc = self.webrtcPC
                 pc.remote_pc_id = answer.id
-                return pc.setRemoteDescription(answer)
-            }).then(() => {
-                return pc.createAnswer()
-            }).then((answer) => {
-                return pc.setLocalDescription(answer)
-            }).then(() => {
-                // Wait for ICE gathering to complete
-                return new Promise((resolve) => {
-                    if (pc.iceGatheringState === 'complete') {
-                        resolve()
-                    } else {
-                        const checkState = () => {
-                            if (pc.iceGatheringState === 'complete') {
-                                pc.removeEventListener('icegatheringstatechange', checkState)
-                                resolve()
-                            }
-                        }
-                        pc.addEventListener('icegatheringstatechange', checkState)
+
+                pc.addTransceiver('video', {direction: 'recvonly'})
+                pc.addEventListener('track', (event) => {
+                    debug(`track event: ${event.track.kind}`)
+                    if (event.track.kind === 'video') {
+                        video.srcObject = event.streams[0]
                     }
                 })
+                pc.addEventListener('icecandidate', (event) => {
+                    if (event.candidate) {
+                        return fetch(url, {
+                            body: JSON.stringify({
+                                type: 'remote_candidate',
+                                id: self.webrtcPC.remote_pc_id,
+                                candidates: [event.candidate],
+                            }),
+                            method: 'POST',
+                        }).catch((e) => {
+                            error("Error sending remote candidate: ")
+                            console.error(e)
+                        })
+                    }
+                })
+
+                return pc.setRemoteDescription(answer)
+            }).then(() => {
+                return self.webrtcPC.createAnswer()
             }).then((answer) => {
-                const offer = pc.localDescription
+                return self.webrtcPC.setLocalDescription(answer)
+            }).then(() => {
+                const offer = self.webrtcPC.localDescription
 
                 return fetch(url, {
                     body: JSON.stringify({
                         type: offer.type,
-                        id: pc.remote_pc_id,
+                        id: self.webrtcPC.remote_pc_id,
                         sdp: offer.sdp,
                     }),
                     method: 'POST',
