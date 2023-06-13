@@ -19,6 +19,17 @@
 </div>
 {% endif %}
 
+{# Check if Classic Webcam still enabled #}
+{% if "plugin_camerastreamer_control_classicam_enabled" %}
+<div class="alert-block alert-warning">
+    <p>
+        <strong>It looks like Classic Webcam is still enabled</strong>
+        <br/>
+        You probably don't need this enabled any more and can disable it in the plugin manager.
+    </p>
+</div>
+{% endif %}
+
 <h5>Stream Options</h5>
 
 <div class="form-horizontal" onsubmit="return false">

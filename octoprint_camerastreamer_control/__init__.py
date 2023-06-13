@@ -56,14 +56,14 @@ class CameraStreamerControlPlugin(
         # In early OctoPi-UpToDate builds (build 20230322130804 or older)
         # camera-streamer was installed from source here
         camera_streamer_path_old = pathlib.Path("usr", "local", "bin", "camera-streamer")
-
         # Later releases installed via apt and it moved
         camera_streamer_path = pathlib.Path("usr", "bin", "camera-streamer")
 
-        # TODO check OctoPi-UpToDate version as well?
+        classicam_enabled = self._plugin_manager.get_plugin("classicwebcam", require_enabled=True)
 
         return {
             "installed": camera_streamer_path.exists() or camera_streamer_path_old.exists(),
+            "classicam_enabled": classicam_enabled,
         }
 
     def get_assets(self):
