@@ -80,3 +80,11 @@
   transition: 0.3s;
   opacity: 1;
 }
+#webcam_plugin_camerastreamer_control .csc-webcamloading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  animation: pulsate 3s ease-out;
+  animation-iteration-count: infinite;
+}

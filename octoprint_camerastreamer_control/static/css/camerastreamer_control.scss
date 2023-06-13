@@ -97,4 +97,13 @@
     transition: 0.3s;  // Aligns with the nav transition
     opacity: 1;
   }
+
+  .csc-webcamloading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    animation: pulsate 3s ease-out;
+    animation-iteration-count: infinite;
+  }
 }

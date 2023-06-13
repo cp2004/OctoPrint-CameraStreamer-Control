@@ -34,7 +34,6 @@ $(function() {
          *  * timeout if webrtc doesn't load
          *  * Smooth settings configuration
          *  Goal 2: Support multiple camera-streamer cameras - this is stretch goal for future
-         *  Finally: sort out logging
          */
         var self = this;
 
@@ -63,6 +62,7 @@ $(function() {
         self.currentMode = ko.observable("")
         self.streamStopTimer = null
         self.fallbackError = ko.observable(false)
+        self.loading = ko.observable(false)
 
         self.webcamClass = ko.pureComputed(() => {
             const flipH = self.getSetting("flipH")() ? 'csc-flipH' : ''
@@ -189,6 +189,8 @@ $(function() {
 
         self.startMjpg = function () {
             self.currentMode("mjpg")
+            self.loading(true)
+
             debug("Starting MJPG stream from " + self.getSetting("url")())
 
             const element = document.getElementById(id("mjpg_image"))
@@ -196,7 +198,6 @@ $(function() {
 
             // TODO safari bug workaround
 
-            // Camera streamer uses `stream` or `?action=stream`
             const newsrc = self.getSetting("url")() + self.getSetting(["mjpg", "url"])()
 
             if (currentsrc !== newsrc) {
@@ -215,8 +216,7 @@ $(function() {
         }
 
         self.onMjpgLoaded = function () {
-            // TODO what do we need this for?
-            // maybe useful for timeouts
+            self.loading(false)
         }
 
         self.onMjpgError = function () {
@@ -226,7 +226,6 @@ $(function() {
         }
 
         // webrtc mode
-
         self.webrtcPC = null
 
         self.startWebRTC = function () {
@@ -234,6 +233,7 @@ $(function() {
             if (self.webrtcPC !== null) {
                 self.stopWebRTC()
             }
+            self.loading(true)
 
             self.currentMode("webrtc")
             debug("Starting WebRTC stream from " + self.getSetting("url")())
@@ -256,6 +256,9 @@ $(function() {
                     warn("Video paused but we're PiP, playing again")
                 }
             })
+            video.addEventListener('play', () => {
+                self.loading(false)
+            })
             // Add size change listener to rotate the video
             video.onresize = self.rotateVideo
 
@@ -264,7 +267,7 @@ $(function() {
 
             const pc = new RTCPeerConnection({
                 sdpSemantics: 'unified-plan',
-                iceServers: [  //  TODO configurable as comma separated list
+                iceServers: [
                     {urls: self.getSetting(["webrtc", "stun"])().split(",").map(url => url.trim())},
                 ]
             })

@@ -5,11 +5,16 @@
     </div>
 </div>
 <div id="{{ macros.id("mjpg_container") }}">
-    <div data-bind="class: webcamClass" {# data-bind="css: {webcam_rotated: settings.rotate90(), webcam_unrotated: !settings.rotate90()}" #}>
-        <div class="{{ macros.id("mjpg_ratio") }}" {# data-bind="css: webcamRatioClass" #}>
+    <div data-bind="class: webcamClass">
+        <div class="{{ macros.id("mjpg_ratio") }}">
             <div>
                 <img src="" alt="Webcam View" id="{{ macros.id("mjpg_image") }}" data-bind="event: {load: onMjpgLoaded, error: onMjpgError }">
             </div>
         </div>
     </div>
+</div>
+<div class="csc-webcamloading" data-bind="visible: loading">
+    <p>
+        <strong>Webcam stream loading...</strong>
+    </p>
 </div>

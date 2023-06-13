@@ -1,7 +1,7 @@
 {% import "macros.jinja2" as macros %}
 
 <div class="csc-video-controls btn-group">
-    <div class="btn" data-bind="click: reloadStream" title="Reload stream"><i class="fa-solid fa-refresh"></i></div>
+    <div class="btn" data-bind="click: reloadStream" title="Reload stream"><i class="fa-solid fa-refresh" data-bind="css: { 'fa-spin': loading }"></i></div>
     <div class="btn" data-bind="click: fullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i></div>
     <div class="btn" data-bind="click: togglePiP" title="Picture In Picture"><i class="fa-solid fa-images"></i></div>
 </div>
