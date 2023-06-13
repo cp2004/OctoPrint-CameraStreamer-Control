@@ -9,8 +9,8 @@
 </p>
 
 {# Check for OctoPi installation of camera-streamer #}
-{% if not "plugin_camerastreamer_control_installed" %}
-<div class="alert-block alert-warning">
+{% if not plugin_camerastreamer_control_installed %}
+<div class="alert alert-block alert-warning">
     <p>
         <strong>It looks like camera-streamer is not installed</strong>
         <br/>
@@ -20,8 +20,8 @@
 {% endif %}
 
 {# Check if Classic Webcam still enabled #}
-{% if "plugin_camerastreamer_control_classicam_enabled" %}
-<div class="alert-block alert-warning">
+{% if plugin_camerastreamer_control_classicam_enabled %}
+<div class="alert alert-block alert-warning">
     <p>
         <strong>It looks like Classic Webcam is still enabled</strong>
         <br/>
