@@ -16,10 +16,7 @@ class CameraStreamerControlPlugin(
     _capture_mutex = threading.Lock()
 
     def take_webcam_snapshot(self, _):
-        snapshot_url = f"{self._settings.get(['url']).rstrip('/')}/{self._settings.get(['snapshot', 'url'])}"
-
-        if not snapshot_url.startswith("http"):
-            snapshot_url = f"http://127.0.0.1/{snapshot_url.lstrip('/')}"
+        snapshot_url = self._build_url(self._settings.get(["url"]), "snapshot")
 
         with self._capture_mutex:
             self._logger.debug(f"Capturing image from {snapshot_url}")
@@ -40,7 +37,6 @@ class CameraStreamerControlPlugin(
             "flipV": False,
             "rotate90": False,
             "timeout": 5,
-            "ratio": "16:9",  # TODO not used anywhere?
             "webrtc": {
                 "url": "webrtc",
                 "stun": "stun:stun.l.google.com:19302",
@@ -102,12 +98,10 @@ class CameraStreamerControlPlugin(
         }
 
     def get_webcam_configurations(self):
-        url = self._settings.get(["url"]).rstrip("/")
-
-        if not url.startswith("http"):
-            snapshot_url = f"http://127.0.0.1/{url.lstrip('/')}/snapshot"
-        else:
-            snapshot_url = f"{url}/snapshot"
+        base_url = self._settings.get(["url"])
+        snapshot_url = self._build_url(base_url, "snapshot")
+        mode = self._settings.get(["mode"])
+        preferred_url = self._build_url(base_url, mode)
 
         return [
             Webcam(
@@ -119,16 +113,44 @@ class CameraStreamerControlPlugin(
                 flipV=self._settings.get_boolean(["flipV"]),
                 rotate90=self._settings.get_boolean(["rotate90"]),
                 compat=WebcamCompatibility(
-                    stream=f"{url}/stream",
+                    stream=self._build_url(base_url, "mjpg"),
                     streamTimeout=self._settings.get_int(["timeout"]),
-                    streamRatio=self._settings.get(["ratio"]),
+                    streamRatio="16:9",  # Required for compatibility, but we don't actually use
                     streamWebrtcIceServers=[self._settings.get(["webrtc", "stun"])],
                     snapshot=snapshot_url,
                     snapshotTimeout=self._settings.get(["snapshot", "timeout"]),
                     snapshotSslValidation=self._settings.get(["snapshot", "validate_ssl"])
-                )
+                ),
+                extras={
+                    "mode": mode,
+                    "url": preferred_url,
+                    "webrtc": {
+                        "stun": self._settings.get(["webrtc", "stun"]),
+                    },
+                    "mjpg": {
+                        "cacheBuster": self._settings.get_boolean(["mjpg", "cacheBuster"]),
+                    },
+                }
             )
         ]
+
+    def _build_url(self, url, mode):
+        """
+        Construct a URL for the selected stream type
+        :return: string: URL to request for stream
+        """
+
+        url = url.rstrip("/")
+
+        if mode == "webrtc":
+            return f"{url}/{self._settings.get(['webrtc', 'url'])}"
+        elif mode == "mjpg":
+            return f"{url}/{self._settings.get(['mjpg', 'url'])}"
+        elif mode == "snapshot":
+            if not url.startswith("http"):
+                return f"http://127.0.0.1/{url.lstrip('/')}/{self._settings.get(['snapshot', 'url']).strip('/')}"
+            else:
+                return f"{url}/{self._settings.get(['snapshot', 'url']).strip('/')}"
 
     def get_template_configs(self):
         return [
