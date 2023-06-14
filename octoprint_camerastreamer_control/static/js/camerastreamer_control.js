@@ -269,7 +269,7 @@ $(function() {
             fetch(url, {
                 body: JSON.stringify({
                     type: 'request',
-                    iceServers: iceServers,
+                    iceServers: [{urls: iceServers}],
                 }),
                 method: 'POST',
                 // todo abort fetch with AbortController
