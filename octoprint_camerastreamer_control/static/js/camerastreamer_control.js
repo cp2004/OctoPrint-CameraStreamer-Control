@@ -100,7 +100,10 @@ $(function() {
             }
         }
 
-        self.onWebcamVisbilityChange = self.onWebcamVisibilityChange  // This is a typo in OctoPrint 1.9.0rc1-3
+        window.addEventListener("beforeunload", function (e) {
+            // Stop the stream when the page is unloaded to avoid leaving zombie streams in camera-streamer
+            self.stopStream(true)
+        })
 
         self.onEventSettingsUpdated = function () {
             // Reload the stream when settings are changed
