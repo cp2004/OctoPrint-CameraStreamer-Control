@@ -30,10 +30,10 @@ $(function() {
 
     function CameraStreamerControlViewModel(parameters) {
         /* TODO list
-         *  Goal 1: Support Mjpg & WebRTC streams smoothly for one camera
+         *  Goal 1: Support Mjpg & WebRTC streams smoothly for one camera:
          *  * timeout if webrtc doesn't load
-         *  * Smooth settings configuration
-         *  Goal 2: Support multiple camera-streamer cameras - this is stretch goal for future
+         *  Goal 2: Support multiple camera-streamer cameras - stretch goal
+         *  Goal 3: Support mp4/mkv/hls streams as well - stretch goal
          */
         var self = this;
 

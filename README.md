@@ -12,6 +12,10 @@ the smooth streaming but my lack of time held it up. It's maintenance will need 
 
 Using OctoPi's new camera stack? Add this plugin to watch your prints in shiny, fast, low bandwidth H264 glory!
 
+*The new camera stack is not fully stable yet, and neither is this plugin. Please report issues you find!*
+
+*There may be cases where the new stack does not work for you. Please make a backup of your OctoPi instance & be prepared to revert!*
+
 ## How do I use it?
 
 First, you need to be using the recent updates to the streaming stack in OctoPi, based on camera-streamer that
@@ -41,9 +45,9 @@ to view your webcam as well! You can switch stream formats in the plugin setting
 
 ![Image showing the new option in the settings tab](images/settings_tab.png)
 
-### A note on WebRTC support
+### ⚠️ A note on WebRTC support
 
-This is still an 'experimental' feature and issues will continue to be worked out. If your stream fails to connect,
+**This is still an 'experimental' feature** and issues will continue to be worked out. If your stream fails to connect,
 the plugin will automatically fall back to the old mjpg stream, so you shouldn't see any interruption.
 
 It is also important to note that camera-streamer uses the Pi's hardware encoders to do the heavy lifting here. On
