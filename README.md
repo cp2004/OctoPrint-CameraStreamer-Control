@@ -1,8 +1,12 @@
 # OctoPrint Camera Streamer Control Plugin
 
-## ⚠️ Work in progress ⚠️
+## ⚠️ Slow maintenance ⚠️
 
-*Not everything will work as expected or is complete yet!*
+**I have very little time to work on this & my other plugins at the moment.**
+
+If you have an issue, please report it. If you think that you can debug & fix an issue, please
+submit a PR and I will be happy to merge it. I wanted to get this plugin out so people could enjoy
+the smooth streaming but my lack of time held it up. It's maintenance will need help from the community.
 
 ---
 
@@ -14,12 +18,12 @@ First, you need to be using the recent updates to the streaming stack in OctoPi,
 Gina published a short while ago. [For info on that, see the blog post here](https://octoprint.org/blog/2023/05/24/a-new-camera-stack-for-octopi/).
 
 You can install this image through the Raspberry Pi Imager. Follow the steps on <https://octoprint.org/download>,
-but select the 'new camera stack image':
+but select the 'new camera stack' image:
 
 ![Image highlighting the correct image in the Pi imager](images/pi_imager.png)
 
-Once that is set up and running, you'll be able to install this plugin. It can be installed from the plugin manager
-using this URL:
+Once that is set up and running, you'll be able to install this plugin. It can be installed by finding it
+from the plugin manager or manually using this URL:
 
 ```
 https://github.com/cp2004/OctoPrint-CameraStreamer-Control/archive/refs/heads/main.zip
